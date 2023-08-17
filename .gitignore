@@ -1,0 +1,4 @@
+# Project exclude paths
+/target/
+.idea
+JDBC_Project.iml
