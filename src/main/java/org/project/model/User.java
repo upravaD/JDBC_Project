@@ -3,7 +3,7 @@ package org.project.model;
 public class User {
     private Long id;
     private String username;
-    private Role roleId;
+    private Role role;
 
     public User() {
         //
@@ -23,10 +23,19 @@ public class User {
         this.username = username;
     }
 
-    public Role getRoleId() {
-        return roleId;
+    public Role getRole() {
+        return role;
     }
-    public void setRoleId(Role roleId) {
-        this.roleId = roleId;
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", role=" + role +
+                '}';
     }
 }
