@@ -9,9 +9,10 @@ public abstract class PropertiesReader {
     protected final Properties properties;
 
     protected PropertiesReader() {
+
         properties = new Properties();
-        try {
-            InputStream inputStream = getClass().getClassLoader().getResourceAsStream(CONFIG_PATH);
+
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(CONFIG_PATH)) {
             properties.load(inputStream);
         } catch (IOException e) {
             e.printStackTrace();

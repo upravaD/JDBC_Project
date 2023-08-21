@@ -1,23 +1,10 @@
 package org.project;
 
-import org.project.util.PostgresConnection;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import org.project.dao.UserDAO;
 
 public class Main {
-    public static void main(String[] args) throws Exception {
-        Connection connection  = PostgresConnection.getConnection();
-
-        Statement statement = connection.createStatement();
-        ResultSet results = statement.executeQuery("SELECT * FROM users");
-
-        while (results.next()) {
-            Integer id = results.getInt(1);
-            String name = results.getString(2);
-            System.out.println(id + " " + name);
-        }
-        connection.close();
+    public static void main(String[] args) {
+        UserDAO userDAO = new UserDAO();
+        System.out.println(userDAO.getALL());
     }
 }
