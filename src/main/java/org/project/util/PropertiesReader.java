@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class PropertiesReader {
+public abstract class PropertiesReader {
     private static final String CONFIG_PATH = "application.properties";
     protected final Properties properties;
 

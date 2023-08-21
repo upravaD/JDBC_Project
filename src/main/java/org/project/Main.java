@@ -11,7 +11,7 @@ public class Main {
         Connection connection  = PostgresConnection.getConnection();
 
         Statement statement = connection.createStatement();
-        ResultSet results = statement.executeQuery("SELECT * FROM roles");
+        ResultSet results = statement.executeQuery("SELECT * FROM users");
 
         while (results.next()) {
             Integer id = results.getInt(1);

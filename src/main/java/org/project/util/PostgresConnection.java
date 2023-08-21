@@ -8,12 +8,11 @@ public class PostgresConnection {
     private PostgresConnection(){}
 
     public static Connection getConnection() throws SQLException {
-
-        PropertiesReader propertiesReader = new PropertiesReader();
+        PostgresPropertiesReader propertiesReader = new PostgresPropertiesReader();
         return DriverManager.getConnection(
-                propertiesReader.properties.getProperty("URL"),
-                propertiesReader.properties.getProperty("USER"),
-                propertiesReader.properties.getProperty("PASSWORD")
+                propertiesReader.getUrl(),
+                propertiesReader.getUser(),
+                propertiesReader.getPassword()
         );
     }
 }
