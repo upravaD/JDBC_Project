@@ -11,7 +11,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDAO implements DAO {
+public class UserDAO implements DAO<User> {
 
     private static final String INSERT_USER = "INSERT INTO users (username, role_id) VALUES (?, ?)";
     private static final String SELECT_ALL_USERS = "SELECT * FROM users";
@@ -20,7 +20,7 @@ public class UserDAO implements DAO {
     private static final String DELETE_USER = "DELETE FROM users WHERE id = ?";
 
     @Override
-    public void create(User user) {
+    public void create(User value) {
 
     }
 
@@ -37,11 +37,9 @@ public class UserDAO implements DAO {
                 user.setId(resultSet.getLong("id"));
                 user.setUsername(resultSet.getString("username"));
 
-                // Получение роли пользователя по role_id из базы данных
                 int roleId = resultSet.getInt("role_id");
                 RoleDAO roleDAO = new RoleDAO();
                 Role role = roleDAO.findById(roleId);
-
                 user.setRole(role);
 
                 users.add(user);
@@ -53,17 +51,17 @@ public class UserDAO implements DAO {
     }
 
     @Override
-    public User findByID() {
+    public User findByID(int id) {
         return null;
     }
 
     @Override
-    public void update() {
+    public void update(User value) {
 
     }
 
     @Override
-    public void delete() {
+    public void delete(User value) {
 
     }
 }

@@ -5,10 +5,6 @@ public class User {
     private String username;
     private Role role;
 
-    public User() {
-        //
-    }
-
     public Long getId() {
         return id;
     }

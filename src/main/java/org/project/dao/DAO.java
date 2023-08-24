@@ -1,13 +1,11 @@
 package org.project.dao;
 
-import org.project.model.User;
-
 import java.util.List;
 
-public interface DAO {
-    void create(User user);
-    List<User> getALL();
-    User findByID();
-    void update();
-    void delete();
+public interface DAO<T> {
+    void create(T value);
+    List<T> getALL();
+    T findByID(int id);
+    void update(T value);
+    void delete(T value);
 }

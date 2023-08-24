@@ -1,4 +1,110 @@
 package org.project.dao;
 
-public class PermissionDAO {
+import org.project.model.Permission;
+import org.project.util.PostgresConnection;
+import org.project.util.Queries;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class PermissionDAO implements DAO<Permission> {
+
+    @Override
+    public void create(Permission value) {
+
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.PERMISSION_CREATE.get())) {
+
+            preparedStatement.setString(1, value.getPermissionName());
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public List<Permission> getALL() {
+        List<Permission> permissions = new ArrayList<>();
+
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.PERMISSION_GET_ALL.get())) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Permission permission;
+
+            while (resultSet.next()) {
+                permission = new Permission();
+                permission.setId(resultSet.getLong("id"));
+                permission.setPermissionName(resultSet.getString("permission_name"));
+                permissions.add(permission);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return permissions;
+    }
+
+    @Override
+    public Permission findByID(int id) {
+        Permission permission = null;
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.PERMISSION_FIND_BY_ID.get())) {
+
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                permission = new Permission();
+                permission.setId(resultSet.getLong("id"));
+                permission.setPermissionName(resultSet.getString("permission_name"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        if (permission == null) {
+            permission = new Permission(); // Создаем пустой объект, чтобы избежать возврата null
+            permission.setId(-1L);
+            permission.setPermissionName("emptyPermissionName");
+        }
+
+        return permission;
+    }
+
+    @Override
+    public void update(Permission value) {
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.PERMISSION_UPDATE.get())) {
+
+            preparedStatement.setLong(2, value.getId());
+            preparedStatement.setString(1, value.getPermissionName());
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void delete(Permission value) {
+
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.PERMISSION_DELETE.get())) {
+
+            preparedStatement.setLong(1, value.getId());
+            preparedStatement.setString(2, value.getPermissionName());
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

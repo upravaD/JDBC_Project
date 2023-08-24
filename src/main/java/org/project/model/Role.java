@@ -7,10 +7,6 @@ public class Role {
     private String roleName;
     private List<Permission> permissions; // Связь many-to-many с Permission
 
-    public Role() {
-        //
-    }
-
     public Long getId() {
         return id;
     }
