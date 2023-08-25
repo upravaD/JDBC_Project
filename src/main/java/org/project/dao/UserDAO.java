@@ -39,7 +39,7 @@ public class UserDAO implements DAO<User> {
 
                 int roleId = resultSet.getInt("role_id");
                 RoleDAO roleDAO = new RoleDAO();
-                Role role = roleDAO.findById(roleId);
+                Role role = roleDAO.findByID(roleId);
                 user.setRole(role);
 
                 users.add(user);

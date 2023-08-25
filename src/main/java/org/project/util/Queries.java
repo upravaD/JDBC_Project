@@ -8,9 +8,9 @@ public enum Queries {
     PERMISSION_UPDATE("UPDATE permissions SET permission_name = ? WHERE id = ?"),
     PERMISSION_DELETE("DELETE FROM permissions WHERE id = ? AND permission_name = ?"),
 
-    ROLE_CREATE(""),
-    ROLE_GET_ALL(""),
-    ROLE_FIND_BY_ID(""),
+    ROLE_CREATE("INSERT INTO roles (id, role_name) VALUES (DEFAULT, ?)"),
+    ROLE_GET_ALL("SELECT r.id, r.role_name, p.permission_name FROM roles r LEFT JOIN role_permissions rp ON r.id = rp.role_id LEFT JOIN permissions p ON rp.permission_id = p.id"),
+    ROLE_FIND_BY_ID("SELECT r.id, r.role_name, p.permission_name FROM roles r LEFT JOIN role_permissions rp ON r.id = rp.role_id LEFT JOIN permissions p ON rp.permission_id = p.id WHERE r.id = ?"),
     ROLE_UPDATE(""),
     ROLE_DELETE(""),
 
