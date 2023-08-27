@@ -14,15 +14,12 @@ import java.util.List;
 
 public class RoleDAO implements DAO<Role> {
 
-    private static final String ROLE_GET_ALL = "SELECT * FROM roles WHERE id = ?";
-    private static final String SELECT_ROLE_BY_ID = "SELECT r.id AS role_id, r.role_name, p.id AS permission_id, p.permission_name FROM roles r LEFT JOIN role_permissions rp ON r.id = rp.role_id LEFT JOIN permissions p ON rp.permission_id = p.id WHERE r.id = ?";
-
     @Override
-    public void create(Role value) {
+    public void create(Role role) {
         try (Connection connection = PostgresConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(Queries.ROLE_CREATE.get())) {
 
-            preparedStatement.setString(1, value.getRoleName());
+            preparedStatement.setString(1, role.getRoleName());
             preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
@@ -36,16 +33,10 @@ public class RoleDAO implements DAO<Role> {
 
         try (Connection connection = PostgresConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(Queries.ROLE_GET_ALL.get())) {
+
             ResultSet resultSet = preparedStatement.executeQuery();
-            Role role;
-
             while (resultSet.next()) {
-                role = new Role();
-                role.setId(resultSet.getLong("id"));
-                role.setRoleName(resultSet.getString("role_name"));
-                List<Permission> permissions = new ArrayList<>();
-
-                roles.add(role);
+                roles.add(findByID(resultSet.getLong("id")));
             }
 
         } catch (SQLException e) {
@@ -55,39 +46,101 @@ public class RoleDAO implements DAO<Role> {
     }
 
     @Override
-    public Role findByID(int id) {
+    public Role findByID(Long id) {
         Role role = new Role();
-        try (Connection connection = PostgresConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ROLE_BY_ID)) {
+        List<Permission> tempPermissions = new ArrayList<>();
 
-            preparedStatement.setInt(1, id);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                boolean roleFound = false;
-                while (resultSet.next()) {
-                    if (!roleFound) {
-                        role.setId(resultSet.getLong("role_id"));
-                        role.setRoleName(resultSet.getString("role_name"));
-                        roleFound = true;
-                    }
-                    PermissionDAO permissionDAO = new PermissionDAO();
-                    Permission permission = permissionDAO.findByID(resultSet.getInt("permission_id"));
-                    role.setPermissions(new ArrayList<>());
-                    role.getPermissions().add(permission);
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.ROLE_FIND_BY_ID.get())) {
+
+            preparedStatement.setLong(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            boolean roleFound = false;
+            while (resultSet.next()) {
+                if (!roleFound) {
+                    role.setId(resultSet.getLong("role_id"));
+                    role.setRoleName(resultSet.getString("role_name"));
+                    roleFound = true;
                 }
+                PermissionDAO permissionDAO = new PermissionDAO();
+                Permission permission = permissionDAO.findByID(resultSet.getLong("permission_id"));
+                tempPermissions.add(permission);
             }
+            role.setPermissions(tempPermissions);
+
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+
+        if (role.getId() == null) {
+            role.setId(-1L);
+            role.setRoleName("emptyRoleName");
         }
         return role;
     }
 
     @Override
-    public void update(Role value) {
+    public void update(Role role) {
+        if (isExist(role.getId())) {
+            try (Connection connection = PostgresConnection.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(Queries.ROLE_UPDATE.get())) {
 
+                preparedStatement.setString(1, role.getRoleName());
+                preparedStatement.setLong(2, role.getId());
+                preparedStatement.executeUpdate();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
-    public void delete(Role value) {
+    public void delete(Role role) {
+        if (isExist(role.getId())) {
+            deleteRolePermission(role);
 
+            try (Connection connection = PostgresConnection.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(Queries.ROLE_DELETE.get())) {
+
+                preparedStatement.setLong(1, role.getId());
+                preparedStatement.setString(2, role.getRoleName());
+                preparedStatement.executeUpdate();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void setRolePermission(Role role, Permission permission) {
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.ROLE_SET_PERMISSIONS.get())) {
+
+            preparedStatement.setLong(1, role.getId());
+            preparedStatement.setLong(2, permission.getId());
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteRolePermission(Role role) {
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.ROLE_DELETE_ROLE_PERMISSION.get())) {
+
+            preparedStatement.setLong(1, role.getId());
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean isExist(Long id) {
+        return findByID(id).getId() != -1L;
     }
 }

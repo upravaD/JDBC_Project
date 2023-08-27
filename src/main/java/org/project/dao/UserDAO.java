@@ -3,25 +3,26 @@ package org.project.dao;
 import org.project.model.Role;
 import org.project.model.User;
 import org.project.util.PostgresConnection;
+import org.project.util.Queries;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserDAO implements DAO<User> {
 
-    private static final String INSERT_USER = "INSERT INTO users (username, role_id) VALUES (?, ?)";
-    private static final String SELECT_ALL_USERS = "SELECT * FROM users";
-    private static final String SELECT_USER_BY_ID = "SELECT * FROM users WHERE id = ?";
-    private static final String UPDATE_USER = "UPDATE users SET username = ?, role_id = ? WHERE id = ?";
-    private static final String DELETE_USER = "DELETE FROM users WHERE id = ?";
-
     @Override
-    public void create(User value) {
+    public void create(User user) {
+            try (Connection connection = PostgresConnection.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(Queries.USER_CREATE.get())) {
 
+                preparedStatement.setString(1, user.getUsername());
+                preparedStatement.setLong(2, user.getRole().getId());
+                preparedStatement.executeUpdate();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
     }
 
     @Override
@@ -30,16 +31,15 @@ public class UserDAO implements DAO<User> {
 
         try (Connection connection = PostgresConnection.getConnection();
              Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(SELECT_ALL_USERS)) {
+             ResultSet resultSet = statement.executeQuery(Queries.USER_GET_ALL.get())) {
 
             while (resultSet.next()) {
                 User user = new User();
                 user.setId(resultSet.getLong("id"));
                 user.setUsername(resultSet.getString("username"));
 
-                int roleId = resultSet.getInt("role_id");
                 RoleDAO roleDAO = new RoleDAO();
-                Role role = roleDAO.findByID(roleId);
+                Role role = roleDAO.findByID(resultSet.getLong("role_id"));
                 user.setRole(role);
 
                 users.add(user);
@@ -51,17 +51,69 @@ public class UserDAO implements DAO<User> {
     }
 
     @Override
-    public User findByID(int id) {
-        return null;
+    public User findByID(Long id) {
+        User user = null;
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.USER_FIND_BY_ID.get())) {
+
+            preparedStatement.setLong(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+              user = new User();
+              user.setId(resultSet.getLong("id"));
+              user.setUsername(resultSet.getString("username"));
+              user.setRole(new RoleDAO().findByID(resultSet.getLong("role_id")));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        if (user == null) {
+            user = new User();
+            user.setId(-1L);
+            user.setUsername("emptyUserName");
+            user.setRole(new RoleDAO().findByID(-1L));
+        }
+        return user;
     }
 
     @Override
-    public void update(User value) {
+    public void update(User user) {
+        if (isExist(user.getId())) {
+            try (Connection connection = PostgresConnection.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(Queries.USER_UPDATE.get())) {
 
+                preparedStatement.setString(1, user.getUsername());
+                preparedStatement.setLong(2, user.getRole().getId());
+                preparedStatement.setLong(3, user.getId());
+                preparedStatement.executeUpdate();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
-    public void delete(User value) {
+    public void delete(User user) {
+        if (isExist(user.getId())) {
+            try (Connection connection = PostgresConnection.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(Queries.USER_DELETE.get())) {
 
+                preparedStatement.setLong(1, user.getId());
+                preparedStatement.setString(2, user.getUsername());
+                preparedStatement.executeUpdate();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public boolean isExist(Long id) {
+        return findByID(id).getId() != -1L;
     }
 }

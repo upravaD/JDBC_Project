@@ -14,12 +14,11 @@ import java.util.List;
 public class PermissionDAO implements DAO<Permission> {
 
     @Override
-    public void create(Permission value) {
-
+    public void create(Permission permission) {
         try (Connection connection = PostgresConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(Queries.PERMISSION_CREATE.get())) {
 
-            preparedStatement.setString(1, value.getPermissionName());
+            preparedStatement.setString(1, permission.getPermissionName());
             preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
@@ -52,12 +51,12 @@ public class PermissionDAO implements DAO<Permission> {
     }
 
     @Override
-    public Permission findByID(int id) {
+    public Permission findByID(Long id) {
         Permission permission = null;
         try (Connection connection = PostgresConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(Queries.PERMISSION_FIND_BY_ID.get())) {
 
-            preparedStatement.setInt(1, id);
+            preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
@@ -80,12 +79,44 @@ public class PermissionDAO implements DAO<Permission> {
     }
 
     @Override
-    public void update(Permission value) {
-        try (Connection connection = PostgresConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(Queries.PERMISSION_UPDATE.get())) {
+    public void update(Permission permission) {
+        if (isExist(permission.getId())) {
+            try (Connection connection = PostgresConnection.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(Queries.PERMISSION_UPDATE.get())) {
 
-            preparedStatement.setLong(2, value.getId());
-            preparedStatement.setString(1, value.getPermissionName());
+                preparedStatement.setString(1, permission.getPermissionName());
+                preparedStatement.setLong(2, permission.getId());
+                preparedStatement.executeUpdate();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void delete(Permission permission) {
+        if (isExist(permission.getId())) {
+            deleteRolePermission(permission);
+
+            try (Connection connection = PostgresConnection.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(Queries.PERMISSION_DELETE.get())) {
+
+                preparedStatement.setLong(1, permission.getId());
+                preparedStatement.setString(2, permission.getPermissionName());
+                preparedStatement.executeUpdate();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void deleteRolePermission(Permission permission) {
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.PERMISSION_DELETE_PERMISSION_ROLE.get())) {
+
+            preparedStatement.setLong(1, permission.getId());
             preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
@@ -94,17 +125,7 @@ public class PermissionDAO implements DAO<Permission> {
     }
 
     @Override
-    public void delete(Permission value) {
-
-        try (Connection connection = PostgresConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(Queries.PERMISSION_DELETE.get())) {
-
-            preparedStatement.setLong(1, value.getId());
-            preparedStatement.setString(2, value.getPermissionName());
-            preparedStatement.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public boolean isExist(Long id) {
+        return findByID(id).getId() != -1L;
     }
 }
