@@ -13,16 +13,16 @@ public class UserDAO implements DAO<User> {
 
     @Override
     public void create(User user) {
-            try (Connection connection = PostgresConnection.getConnection();
-                 PreparedStatement preparedStatement = connection.prepareStatement(Queries.USER_CREATE.get())) {
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.USER_CREATE.get())) {
 
-                preparedStatement.setString(1, user.getUsername());
-                preparedStatement.setLong(2, user.getRole().getId());
-                preparedStatement.executeUpdate();
+            preparedStatement.setString(1, user.getUsername());
+            preparedStatement.setLong(2, user.getRole().getId());
+            preparedStatement.executeUpdate();
 
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -60,10 +60,10 @@ public class UserDAO implements DAO<User> {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-              user = new User();
-              user.setId(resultSet.getLong("id"));
-              user.setUsername(resultSet.getString("username"));
-              user.setRole(new RoleDAO().findByID(resultSet.getLong("role_id")));
+                user = new User();
+                user.setId(resultSet.getLong("id"));
+                user.setUsername(resultSet.getString("username"));
+                user.setRole(new RoleDAO().findByID(resultSet.getLong("role_id")));
             }
 
         } catch (SQLException e) {
@@ -81,39 +81,30 @@ public class UserDAO implements DAO<User> {
 
     @Override
     public void update(User user) {
-        if (isExist(user.getId())) {
-            try (Connection connection = PostgresConnection.getConnection();
-                 PreparedStatement preparedStatement = connection.prepareStatement(Queries.USER_UPDATE.get())) {
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.USER_UPDATE.get())) {
 
-                preparedStatement.setString(1, user.getUsername());
-                preparedStatement.setLong(2, user.getRole().getId());
-                preparedStatement.setLong(3, user.getId());
-                preparedStatement.executeUpdate();
+            preparedStatement.setString(1, user.getUsername());
+            preparedStatement.setLong(2, user.getRole().getId());
+            preparedStatement.setLong(3, user.getId());
+            preparedStatement.executeUpdate();
 
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public void delete(User user) {
-        if (isExist(user.getId())) {
-            try (Connection connection = PostgresConnection.getConnection();
-                 PreparedStatement preparedStatement = connection.prepareStatement(Queries.USER_DELETE.get())) {
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.USER_DELETE.get())) {
 
-                preparedStatement.setLong(1, user.getId());
-                preparedStatement.setString(2, user.getUsername());
-                preparedStatement.executeUpdate();
+            preparedStatement.setLong(1, user.getId());
+            preparedStatement.setString(2, user.getUsername());
+            preparedStatement.executeUpdate();
 
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    }
-
-    @Override
-    public boolean isExist(Long id) {
-        return findByID(id).getId() != -1L;
     }
 }

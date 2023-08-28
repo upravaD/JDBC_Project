@@ -82,35 +82,31 @@ public class RoleDAO implements DAO<Role> {
 
     @Override
     public void update(Role role) {
-        if (isExist(role.getId())) {
-            try (Connection connection = PostgresConnection.getConnection();
-                 PreparedStatement preparedStatement = connection.prepareStatement(Queries.ROLE_UPDATE.get())) {
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.ROLE_UPDATE.get())) {
 
-                preparedStatement.setString(1, role.getRoleName());
-                preparedStatement.setLong(2, role.getId());
-                preparedStatement.executeUpdate();
+            preparedStatement.setString(1, role.getRoleName());
+            preparedStatement.setLong(2, role.getId());
+            preparedStatement.executeUpdate();
 
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public void delete(Role role) {
-        if (isExist(role.getId())) {
-            deleteRolePermission(role);
+        deleteRolePermission(role);
 
-            try (Connection connection = PostgresConnection.getConnection();
-                 PreparedStatement preparedStatement = connection.prepareStatement(Queries.ROLE_DELETE.get())) {
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.ROLE_DELETE.get())) {
 
-                preparedStatement.setLong(1, role.getId());
-                preparedStatement.setString(2, role.getRoleName());
-                preparedStatement.executeUpdate();
+            preparedStatement.setLong(1, role.getId());
+            preparedStatement.setString(2, role.getRoleName());
+            preparedStatement.executeUpdate();
 
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -137,10 +133,5 @@ public class RoleDAO implements DAO<Role> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public boolean isExist(Long id) {
-        return findByID(id).getId() != -1L;
     }
 }

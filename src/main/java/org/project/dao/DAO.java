@@ -8,5 +8,4 @@ public interface DAO<T> {
     T findByID(Long id);
     void update(T value);
     void delete(T value);
-    boolean isExist(Long id);
 }

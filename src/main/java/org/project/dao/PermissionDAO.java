@@ -80,35 +80,31 @@ public class PermissionDAO implements DAO<Permission> {
 
     @Override
     public void update(Permission permission) {
-        if (isExist(permission.getId())) {
-            try (Connection connection = PostgresConnection.getConnection();
-                 PreparedStatement preparedStatement = connection.prepareStatement(Queries.PERMISSION_UPDATE.get())) {
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.PERMISSION_UPDATE.get())) {
 
-                preparedStatement.setString(1, permission.getPermissionName());
-                preparedStatement.setLong(2, permission.getId());
-                preparedStatement.executeUpdate();
+            preparedStatement.setString(1, permission.getPermissionName());
+            preparedStatement.setLong(2, permission.getId());
+            preparedStatement.executeUpdate();
 
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public void delete(Permission permission) {
-        if (isExist(permission.getId())) {
-            deleteRolePermission(permission);
+        deleteRolePermission(permission);
 
-            try (Connection connection = PostgresConnection.getConnection();
-                 PreparedStatement preparedStatement = connection.prepareStatement(Queries.PERMISSION_DELETE.get())) {
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.PERMISSION_DELETE.get())) {
 
-                preparedStatement.setLong(1, permission.getId());
-                preparedStatement.setString(2, permission.getPermissionName());
-                preparedStatement.executeUpdate();
+            preparedStatement.setLong(1, permission.getId());
+            preparedStatement.setString(2, permission.getPermissionName());
+            preparedStatement.executeUpdate();
 
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -122,10 +118,5 @@ public class PermissionDAO implements DAO<Permission> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public boolean isExist(Long id) {
-        return findByID(id).getId() != -1L;
     }
 }
