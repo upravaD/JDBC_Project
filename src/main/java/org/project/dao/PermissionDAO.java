@@ -20,11 +20,25 @@ public class PermissionDAO implements DAO<Permission> {
 
             preparedStatement.setString(1, permission.getPermissionName());
             preparedStatement.executeUpdate();
+            setPermissionId(permission);
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
 
+    private void setPermissionId(Permission permission) {
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.PERMISSION_GET_ID.get())) {
+
+            preparedStatement.setString(1, permission.getPermissionName());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            permission.setId(resultSet.getLong("id"));
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

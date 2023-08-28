@@ -21,6 +21,21 @@ public class RoleDAO implements DAO<Role> {
 
             preparedStatement.setString(1, role.getRoleName());
             preparedStatement.executeUpdate();
+            setRoleId(role);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setRoleId(Role role) {
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.ROLE_GET_ID.get())) {
+
+            preparedStatement.setString(1, role.getRoleName());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            role.setId(resultSet.getLong("id"));
 
         } catch (SQLException e) {
             e.printStackTrace();

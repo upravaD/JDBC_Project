@@ -19,6 +19,21 @@ public class UserDAO implements DAO<User> {
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setLong(2, user.getRole().getId());
             preparedStatement.executeUpdate();
+            setUserId(user);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setUserId(User user) {
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(Queries.USER_GET_ID.get())) {
+
+            preparedStatement.setString(1, user.getUsername());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            user.setId(resultSet.getLong("id"));
 
         } catch (SQLException e) {
             e.printStackTrace();
