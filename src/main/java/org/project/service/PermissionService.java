@@ -6,8 +6,12 @@ import org.project.model.Permission;
 import java.util.List;
 
 public class PermissionService implements Service<Permission> {
+    private final PermissionDAO permissionDAO;
 
-    private final PermissionDAO permissionDAO = new PermissionDAO();
+    public PermissionService() {
+        this.permissionDAO = new PermissionDAO();
+    }
+
     @Override
     public void add(Permission permission) {
         permissionDAO.create(permission);
@@ -25,11 +29,19 @@ public class PermissionService implements Service<Permission> {
 
     @Override
     public void update(Permission permission) {
-        permissionDAO.update(permission);
+        if (isExist(permission.getId())) {
+            permissionDAO.update(permission);
+        } else {
+            throw new IllegalArgumentException("Введен неверный Id");
+        }
     }
 
     @Override
     public void remove(Permission permission) {
         permissionDAO.delete(permission);
+    }
+
+    private boolean isExist(Long id) {
+        return permissionDAO.findByID(id).getId() != -1L;
     }
 }
