@@ -5,14 +5,19 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class PostgresConnection {
+    private static Connection connection;
     private PostgresConnection(){}
-
-    public static Connection getConnection() throws SQLException {
-        PostgresPropertiesReader propertiesReader = new PostgresPropertiesReader();
-        return DriverManager.getConnection(
-                propertiesReader.getUrl(),
-                propertiesReader.getUser(),
-                propertiesReader.getPassword()
-        );
+    public static Connection getConnection() {
+        try {
+            Class.forName("org.postgresql.Driver");
+            PostgresPropertiesReader propertiesReader = new PostgresPropertiesReader();
+            connection = DriverManager.getConnection(
+                    propertiesReader.getUrl(),
+                    propertiesReader.getUser(),
+                    propertiesReader.getPassword());
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return connection;
     }
 }
