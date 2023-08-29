@@ -3,13 +3,14 @@ package org.project.service;
 import org.project.dao.PermissionDAO;
 import org.project.model.Permission;
 
+import java.sql.Connection;
 import java.util.List;
 
 public class PermissionService implements Service<Permission> {
     private final PermissionDAO permissionDAO;
 
-    public PermissionService() {
-        this.permissionDAO = new PermissionDAO();
+    public PermissionService(Connection connection) {
+        this.permissionDAO = new PermissionDAO(connection);
     }
 
     @Override
@@ -38,6 +39,7 @@ public class PermissionService implements Service<Permission> {
 
     @Override
     public void remove(Permission permission) {
+        permissionDAO.deleteRolePermission(permission);
         permissionDAO.delete(permission);
     }
 

@@ -3,13 +3,14 @@ package org.project.service;
 import org.project.dao.UserDAO;
 import org.project.model.User;
 
+import java.sql.Connection;
 import java.util.List;
 
 public class UserService implements Service<User>{
     private final UserDAO userDAO;
 
-    public UserService() {
-        this.userDAO = new UserDAO();
+    public UserService(Connection connection) {
+        this.userDAO = new UserDAO(connection);
     }
 
     @Override
