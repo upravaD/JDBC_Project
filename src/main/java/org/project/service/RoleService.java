@@ -42,7 +42,11 @@ public class RoleService implements Service<Role> {
 
     @Override
     public void remove(Role role) {
-        roleDAO.deleteRolePermission(role);
+        removePermission(role);
         roleDAO.delete(role);
+    }
+
+    public void removePermission(Role role) {
+        roleDAO.deleteRolePermission(role);
     }
 }

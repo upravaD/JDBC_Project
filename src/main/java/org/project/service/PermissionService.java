@@ -30,20 +30,12 @@ public class PermissionService implements Service<Permission> {
 
     @Override
     public void update(Permission permission) {
-        if (isExist(permission.getId())) {
-            permissionDAO.update(permission);
-        } else {
-            throw new IllegalArgumentException("Введен неверный Id");
-        }
+        permissionDAO.update(permission);
     }
 
     @Override
     public void remove(Permission permission) {
         permissionDAO.deleteRolePermission(permission);
         permissionDAO.delete(permission);
-    }
-
-    private boolean isExist(Long id) {
-        return permissionDAO.findByID(id).getId() != -1L;
     }
 }
