@@ -1,6 +1,7 @@
 package org.project.dao;
 
 import org.project.model.Permission;
+import org.project.model.Role;
 import org.project.util.Queries;
 
 import java.sql.Connection;
@@ -104,5 +105,20 @@ public class PermissionDAO implements DAO<Permission> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+    public List<Role> getRolePermissionByID(Permission permission) {
+        List<Role> roles = new ArrayList<>();
+        try (PreparedStatement preparedStatement =
+                     connection.prepareStatement("SELECT role_id FROM role_permissions where permission_id = ?")) {
+            preparedStatement.setLong(1, permission.getId());
+            preparedStatement.execute();
+            ResultSet resultSet = preparedStatement.getResultSet();
+            while (resultSet.next()) {
+                roles.add(new RoleDAO(connection).findByID(resultSet.getLong("role_id")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return roles;
     }
 }

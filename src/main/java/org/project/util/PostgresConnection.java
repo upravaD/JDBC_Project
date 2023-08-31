@@ -20,4 +20,14 @@ public class PostgresConnection {
         }
         return connection;
     }
+
+    public static Connection getConnection(String url, String username, String password) {
+        try {
+            Class.forName("org.postgresql.Driver");
+            connection = DriverManager.getConnection(url, username, password);
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return connection;
+    }
 }
