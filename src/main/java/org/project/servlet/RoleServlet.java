@@ -17,19 +17,27 @@ import java.util.List;
 
 @WebServlet(name = "RoleServlet", value = "/roles")
 public class RoleServlet extends HttpServlet {
-    private Connection connection;
+    private Connection connection = PostgresConnection.getConnection();
     private RoleService roleService;
     private PermissionService permissionService;
 
+    public RoleServlet() {
+    }
+
+    public RoleServlet(RoleService roleService, PermissionService permissionService, Connection connection) {
+        this.roleService = roleService;
+        this.permissionService = permissionService;
+        this.connection = connection;
+    }
+
     @Override
     public void init() {
-        connection = PostgresConnection.getConnection();
         roleService = new RoleService(connection);
         permissionService = new PermissionService(connection);
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) {
         String idParam = request.getParameter("id");
         String json;
 
@@ -45,7 +53,7 @@ public class RoleServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) {
         String requestName = request.getParameter("role_name");
         String[] permissionIds = request.getParameterValues("permissionIds");
 
@@ -60,7 +68,7 @@ public class RoleServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) {
+    public void doPut(HttpServletRequest request, HttpServletResponse response) {
         long requestId = parseLongID(request.getParameter("id"));
         String requestName = request.getParameter("role_name");
         String[] permissionIds = request.getParameterValues("permissionIds");
@@ -76,7 +84,7 @@ public class RoleServlet extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
+    public void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         long requestId = parseLongID(req.getParameter("id"));
 
         Role role = roleService.read(requestId);

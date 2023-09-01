@@ -14,17 +14,24 @@ import java.util.List;
 
 @WebServlet(name = "PermissionServlet", value = "/permissions")
 public class PermissionServlet extends HttpServlet {
-    private Connection connection;
+    private Connection connection = PostgresConnection.getConnection();
     private PermissionService permissionService;
+
+    public PermissionServlet() {
+    }
+
+    public PermissionServlet(PermissionService permissionService, Connection connection) {
+        this.permissionService = permissionService;
+        this.connection = connection;
+    }
 
     @Override
     public void init() {
-        connection = PostgresConnection.getConnection();
         permissionService = new PermissionService(connection);
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) {
         String requestId = request.getParameter("id");
         String json;
 
@@ -40,7 +47,7 @@ public class PermissionServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) {
         String requestName = request.getParameter("permission_name");
 
         Permission permission = new Permission();
@@ -52,7 +59,7 @@ public class PermissionServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) {
+    public void doPut(HttpServletRequest request, HttpServletResponse response) {
         long requestId = parseLongID(request.getParameter("id"));
         String requestName = request.getParameter("permission_name");
 
@@ -65,7 +72,7 @@ public class PermissionServlet extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) {
+    public void doDelete(HttpServletRequest request, HttpServletResponse response) {
         long requestId = parseLongID(request.getParameter("id"));
 
         Permission permission = permissionService.read(requestId);

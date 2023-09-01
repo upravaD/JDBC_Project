@@ -14,8 +14,9 @@ public class PermissionService implements Service<Permission> {
     }
 
     @Override
-    public void add(Permission permission) {
+    public Permission add(Permission permission) {
         permissionDAO.create(permission);
+        return permissionDAO.findByID(permission.getId());
     }
 
     @Override

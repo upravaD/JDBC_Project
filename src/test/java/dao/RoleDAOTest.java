@@ -10,24 +10,40 @@ import org.project.dao.RoleDAO;
 import org.project.model.Permission;
 import org.project.model.Role;
 import org.project.util.PostgresConnection;
+import org.project.util.PostgresPropertiesReader;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
+@Testcontainers
 class RoleDAOTest {
+    private static final PostgresPropertiesReader propertiesReader = new PostgresPropertiesReader();
+    @Container
+    private static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest")
+            .withDatabaseName(propertiesReader.getUrl())
+            .withUsername(propertiesReader.getUser())
+            .withPassword(propertiesReader.getPassword());
     private Connection connection;
     private RoleDAO roleDAO;
 
     @BeforeEach
     public void setup() {
-        connection = PostgresConnection.getConnection();
+        postgres.start();
+        connection = PostgresConnection.getConnection(
+                postgres.getDatabaseName(),
+                postgres.getUsername(),
+                postgres.getPassword());
         roleDAO = new RoleDAO(connection);
     }
 
     @AfterEach
     public void cleanup() throws SQLException {
         connection.close();
+        postgres.stop();
     }
 
     @Test
@@ -152,6 +168,10 @@ class RoleDAOTest {
         Assertions.assertNotNull(updatedRole);
         List<Permission> permissions = updatedRole.getPermissions();
         Assertions.assertTrue(permissions.size() > 0);
+
+        // Cleanup
+        roleDAO.deleteRolePermission(role);
+        roleDAO.delete(role);
     }
 
     @Test

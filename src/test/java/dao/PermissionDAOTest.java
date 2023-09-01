@@ -8,24 +8,40 @@ import org.junit.jupiter.api.Test;
 import org.project.dao.PermissionDAO;
 import org.project.model.Permission;
 import org.project.util.PostgresConnection;
+import org.project.util.PostgresPropertiesReader;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
+@Testcontainers
 class PermissionDAOTest {
+    private static final PostgresPropertiesReader propertiesReader = new PostgresPropertiesReader();
+    @Container
+    private static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest")
+            .withDatabaseName(propertiesReader.getUrl())
+            .withUsername(propertiesReader.getUser())
+            .withPassword(propertiesReader.getPassword());
     private Connection connection;
     private PermissionDAO permissionDAO;
 
     @BeforeEach
     public void setup() {
-        connection = PostgresConnection.getConnection();
+        postgres.start();
+        connection = PostgresConnection.getConnection(
+                postgres.getDatabaseName(),
+                postgres.getUsername(),
+                postgres.getPassword());
         permissionDAO = new PermissionDAO(connection);
     }
 
     @AfterEach
     public void cleanup() throws SQLException {
         connection.close();
+        postgres.stop();
     }
 
     @Test
@@ -42,6 +58,7 @@ class PermissionDAOTest {
         Permission createdPermission = permissionDAO.findByID(permission.getId());
         Assertions.assertNotNull(createdPermission);
         Assertions.assertEquals(name, createdPermission.getPermissionName());
+        Assertions.assertEquals(permission.getId(), createdPermission.getId());
 
         // Cleanup
         permissionDAO.delete(permission);

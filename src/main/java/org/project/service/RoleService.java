@@ -15,14 +15,16 @@ public class RoleService implements Service<Role> {
     }
 
     @Override
-    public void add(Role role) {
+    public Role add(Role role) {
         roleDAO.create(role);
+        return roleDAO.findByID(role.getId());
     }
 
-    public void setRolePermission(Role role, List<Permission> permissions) {
+    public List<Permission> setRolePermission(Role role, List<Permission> permissions) {
         for (Permission permission : permissions) {
             roleDAO.setRolePermission(role, permission);
         }
+        return permissions;
     }
 
     @Override

@@ -15,19 +15,27 @@ import java.util.List;
 
 @WebServlet(name = "UserServlet", value = "/users")
 public class UserServlet extends HttpServlet {
-    private Connection connection;
+    private Connection connection = PostgresConnection.getConnection();
     private UserService userService;
     private RoleService roleService;
 
+    public UserServlet() {
+    }
+
+    public UserServlet(UserService userService, RoleService roleService, Connection connection) {
+        this.userService = userService;
+        this.roleService = roleService;
+        this.connection = connection;
+    }
+
     @Override
     public void init() {
-        connection = PostgresConnection.getConnection();
         userService = new UserService(connection);
         roleService = new RoleService(connection);
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) {
         String requestId = request.getParameter("id");
         String json;
 
@@ -44,7 +52,7 @@ public class UserServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) {
         String requestName = request.getParameter("username");
         long requestRoleId = parseLongID(request.getParameter("role_id"));
 
@@ -58,7 +66,7 @@ public class UserServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) {
+    public void doPut(HttpServletRequest request, HttpServletResponse response) {
         long id = parseLongID(request.getParameter("id"));
         String requestName = request.getParameter("username");
         long roleId = parseLongID(request.getParameter("role_id"));
@@ -73,7 +81,7 @@ public class UserServlet extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) {
+    public void doDelete(HttpServletRequest request, HttpServletResponse response) {
         long id = parseLongID(request.getParameter("id"));
 
         User user = userService.read(id);

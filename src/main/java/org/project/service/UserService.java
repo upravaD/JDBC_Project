@@ -14,8 +14,9 @@ public class UserService implements Service<User>{
     }
 
     @Override
-    public void add(User user) {
+    public User add(User user) {
         userDAO.create(user);
+        return userDAO.findByID(user.getId());
     }
 
     @Override
