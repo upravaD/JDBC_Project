@@ -34,7 +34,7 @@ class PermissionServletTest {
     private static final PostgresPropertiesReader propertiesReader = new PostgresPropertiesReader();
     @Container
     private static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest")
-            .withDatabaseName(propertiesReader.getUrl())
+            .withDatabaseName(propertiesReader.getDataBaseName())
             .withUsername(propertiesReader.getUser())
             .withPassword(propertiesReader.getPassword());
     @Mock

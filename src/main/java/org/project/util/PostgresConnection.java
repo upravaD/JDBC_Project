@@ -24,7 +24,7 @@ public class PostgresConnection {
     public static Connection getConnection(String url, String username, String password) {
         try {
             Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection(url, username, password);
+            connection = DriverManager.getConnection(("jdbc:postgresql://localhost:5432/" + url), username, password);
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
