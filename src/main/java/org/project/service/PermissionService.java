@@ -7,7 +7,7 @@ import java.sql.Connection;
 import java.util.List;
 
 public class PermissionService implements Service<Permission> {
-    private final PermissionDAO permissionDAO;
+    private PermissionDAO permissionDAO;
 
     public PermissionService(Connection connection) {
         this.permissionDAO = new PermissionDAO(connection);
@@ -16,12 +16,15 @@ public class PermissionService implements Service<Permission> {
     @Override
     public Permission add(Permission permission) {
         permissionDAO.create(permission);
+        permission.setRoles(permissionDAO.getRolePermissionByID(permission));
         return permissionDAO.findByID(permission.getId());
     }
 
     @Override
     public Permission read(Long id) {
-        return permissionDAO.findByID(id);
+        Permission permission = permissionDAO.findByID(id);
+        permission.setRoles(permissionDAO.getRolePermissionByID(permission));
+        return permission;
     }
 
     @Override
@@ -30,13 +33,17 @@ public class PermissionService implements Service<Permission> {
     }
 
     @Override
-    public void update(Permission permission) {
-        permissionDAO.update(permission);
+    public boolean update(Permission permission) {
+        return permissionDAO.update(permission);
     }
 
     @Override
-    public void remove(Permission permission) {
+    public boolean remove(Permission permission) {
         permissionDAO.deleteRolePermission(permission);
-        permissionDAO.delete(permission);
+        return permissionDAO.delete(permission);
+    }
+
+    public void setPermissionDAO(PermissionDAO permissionDAO) {
+        this.permissionDAO = permissionDAO;
     }
 }

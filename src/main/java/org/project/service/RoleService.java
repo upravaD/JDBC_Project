@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.util.List;
 
 public class RoleService implements Service<Role> {
-    private final RoleDAO roleDAO;
+    private RoleDAO roleDAO;
 
     public RoleService(Connection connection) {
         this.roleDAO = new RoleDAO(connection);
@@ -38,17 +38,21 @@ public class RoleService implements Service<Role> {
     }
 
     @Override
-    public void update(Role role) {
-        roleDAO.update(role);
+    public boolean update(Role role) {
+        return roleDAO.update(role);
     }
 
     @Override
-    public void remove(Role role) {
+    public boolean remove(Role role) {
         removePermission(role);
-        roleDAO.delete(role);
+        return roleDAO.delete(role);
     }
 
     public void removePermission(Role role) {
         roleDAO.deleteRolePermission(role);
+    }
+
+    public void setRoleDAO(RoleDAO roleDAO) {
+        this.roleDAO = roleDAO;
     }
 }

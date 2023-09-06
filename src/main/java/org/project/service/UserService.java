@@ -7,7 +7,7 @@ import java.sql.Connection;
 import java.util.List;
 
 public class UserService implements Service<User>{
-    private final UserDAO userDAO;
+    private UserDAO userDAO;
 
     public UserService(Connection connection) {
         this.userDAO = new UserDAO(connection);
@@ -30,12 +30,16 @@ public class UserService implements Service<User>{
     }
 
     @Override
-    public void update(User user) {
-        userDAO.update(user);
+    public boolean update(User user) {
+        return userDAO.update(user);
     }
 
     @Override
-    public void remove(User user) {
-        userDAO.delete(user);
+    public boolean remove(User user) {
+        return userDAO.delete(user);
+    }
+
+    public void setUserDAO(UserDAO userDAO) {
+        this.userDAO = userDAO;
     }
 }

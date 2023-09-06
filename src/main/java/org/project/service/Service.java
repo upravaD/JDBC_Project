@@ -6,6 +6,6 @@ public interface Service<T> {
     T add(T value);
     T read(Long id);
     List<T> readAll();
-    void update(T value);
-    void remove(T value);
+    boolean update(T value);
+    boolean remove(T value);
 }
