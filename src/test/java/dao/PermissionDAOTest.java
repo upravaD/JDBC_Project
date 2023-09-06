@@ -6,7 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.project.dao.PermissionDAO;
+import org.project.dao.RoleDAO;
 import org.project.model.Permission;
+import org.project.model.Role;
 import org.project.util.PostgresConnection;
 import org.project.util.PostgresPropertiesReader;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -157,5 +159,34 @@ class PermissionDAOTest {
         Assertions.assertNotNull(deletedPermission);
         Assertions.assertEquals(-1L, deletedPermission.getId());
         Assertions.assertEquals("emptyPermissionName", deletedPermission.getPermissionName());
+    }
+
+    @Test
+    void testGetRolesByPermission() {
+        // Setup
+        RoleDAO roleDAO = new RoleDAO(connection);
+        Permission permission = new Permission();
+        permission.setPermissionName("TestRolesPermission");
+        permissionDAO.create(permission);
+        Role role = new Role();
+        role.setRoleName("TestRole");
+        roleDAO.create(role);
+        roleDAO.setRolePermission(role, permission);
+
+        // Test
+        List<Role> roles = permissionDAO.getRolePermissionByID(permission);
+        Permission expectedPermission = permissionDAO.findByID(permission.getId());
+        expectedPermission.setRoles(roles);
+
+        // Verify
+        Assertions.assertNotNull(roles);
+        Assertions.assertEquals(1, roles.size());
+        Assertions.assertEquals("TestRolesPermission", expectedPermission.getPermissionName());
+        Assertions.assertEquals(roles.get(0), expectedPermission.getRoles().get(0));
+
+        // Cleanup
+        permissionDAO.deleteRolePermission(permission);
+        permissionDAO.delete(permission);
+        roleDAO.delete(role);
     }
 }
