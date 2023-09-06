@@ -19,7 +19,7 @@ public class PermissionDAO implements DAO<Permission> {
     }
 
     @Override
-    public void create(Permission permission) {
+    public boolean create(Permission permission) {
         try (PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.PERMISSION_CREATE.get())) {
             preparedStatement.setString(1, permission.getPermissionName());
@@ -27,9 +27,11 @@ public class PermissionDAO implements DAO<Permission> {
             ResultSet resultSet = preparedStatement.getResultSet();
             resultSet.next();
             permission.setId(resultSet.getLong("id"));
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     @Override
@@ -74,37 +76,43 @@ public class PermissionDAO implements DAO<Permission> {
     }
 
     @Override
-    public void update(Permission permission) {
+    public boolean update(Permission permission) {
         try (PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.PERMISSION_UPDATE.get())) {
             preparedStatement.setString(1, permission.getPermissionName());
             preparedStatement.setLong(2, permission.getId());
             preparedStatement.executeUpdate();
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     @Override
-    public void delete(Permission permission) {
+    public boolean delete(Permission permission) {
         try (PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.PERMISSION_DELETE.get())) {
             preparedStatement.setLong(1, permission.getId());
             preparedStatement.setString(2, permission.getPermissionName());
             preparedStatement.executeUpdate();
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
-    public void deleteRolePermission(Permission permission) {
+    public boolean deleteRolePermission(Permission permission) {
         try (PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.PERMISSION_DELETE_PERMISSION_ROLE.get())) {
             preparedStatement.setLong(1, permission.getId());
             preparedStatement.executeUpdate();
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
     public List<Role> getRolePermissionByID(Permission permission) {
         List<Role> roles = new ArrayList<>();

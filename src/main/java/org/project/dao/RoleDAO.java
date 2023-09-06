@@ -19,7 +19,7 @@ public class RoleDAO implements DAO<Role> {
     }
 
     @Override
-    public void create(Role role) {
+    public boolean create(Role role) {
         try (PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.ROLE_CREATE.get())) {
             preparedStatement.setString(1, role.getRoleName());
@@ -27,9 +27,11 @@ public class RoleDAO implements DAO<Role> {
             ResultSet resultSet = preparedStatement.getResultSet();
             resultSet.next();
             role.setId(resultSet.getLong("id"));
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     @Override
@@ -78,46 +80,54 @@ public class RoleDAO implements DAO<Role> {
     }
 
     @Override
-    public void update(Role role) {
+    public boolean update(Role role) {
         try (PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.ROLE_UPDATE.get())) {
             preparedStatement.setString(1, role.getRoleName());
             preparedStatement.setLong(2, role.getId());
             preparedStatement.executeUpdate();
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     @Override
-    public void delete(Role role) {
+    public boolean delete(Role role) {
         try (PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.ROLE_DELETE.get())) {
             preparedStatement.setLong(1, role.getId());
             preparedStatement.setString(2, role.getRoleName());
             preparedStatement.executeUpdate();
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
-    public void setRolePermission(Role role, Permission permission) {
+    public boolean setRolePermission(Role role, Permission permission) {
         try (PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.ROLE_SET_PERMISSIONS.get())) {
             preparedStatement.setLong(1, role.getId());
             preparedStatement.setLong(2, permission.getId());
             preparedStatement.executeUpdate();
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
-    public void deleteRolePermission(Role role) {
+    public boolean deleteRolePermission(Role role) {
         try (PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.ROLE_DELETE_ROLE_PERMISSION.get())) {
             preparedStatement.setLong(1, role.getId());
             preparedStatement.executeUpdate();
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
 }

@@ -17,7 +17,7 @@ public class UserDAO implements DAO<User> {
     }
 
     @Override
-    public void create(User user) {
+    public boolean create(User user) {
         try (PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.USER_CREATE.get())) {
             preparedStatement.setString(1, user.getUsername());
@@ -26,9 +26,11 @@ public class UserDAO implements DAO<User> {
             ResultSet resultSet = preparedStatement.getResultSet();
             resultSet.next();
             user.setId(resultSet.getLong("id"));
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     @Override
@@ -78,25 +80,29 @@ public class UserDAO implements DAO<User> {
     }
 
     @Override
-    public void update(User user) {
+    public boolean update(User user) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(Queries.USER_UPDATE.get())) {
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setLong(2, user.getRole().getId());
             preparedStatement.setLong(3, user.getId());
             preparedStatement.executeUpdate();
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     @Override
-    public void delete(User user) {
+    public boolean delete(User user) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(Queries.USER_DELETE.get())) {
             preparedStatement.setLong(1, user.getId());
             preparedStatement.setString(2, user.getUsername());
             preparedStatement.executeUpdate();
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
 }

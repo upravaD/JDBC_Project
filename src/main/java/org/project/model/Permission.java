@@ -1,8 +1,11 @@
 package org.project.model;
 
+import java.util.List;
+
 public class Permission {
     private Long id;
     private String permissionName;
+    private List<Role> roles;
 
     public Long getId() {
         return id;
@@ -18,8 +21,18 @@ public class Permission {
         this.permissionName = permissionName;
     }
 
+    public List<Role> getRoles() {
+        return roles;
+    }
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
+
     @Override
     public String toString() {
-        return getId() + " " + getPermissionName();
+        return "\nPermission{" +
+                "id=" + id +
+                ", permissionName='" + permissionName + '\'' +
+                '}';
     }
 }
