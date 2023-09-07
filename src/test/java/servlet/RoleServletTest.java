@@ -12,10 +12,10 @@ import org.project.model.Role;
 import org.project.service.PermissionService;
 import org.project.service.RoleService;
 import org.project.servlet.RoleServlet;
-import org.project.util.PostgresPropertiesReader;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import util.PostgresContainer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,12 +30,8 @@ import static org.mockito.Mockito.*;
 
 @Testcontainers
 class RoleServletTest {
-    private static final PostgresPropertiesReader propertiesReader = new PostgresPropertiesReader();
     @Container
-    private static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest")
-            .withDatabaseName(propertiesReader.getDataBaseName())
-            .withUsername(propertiesReader.getUser())
-            .withPassword(propertiesReader.getPassword());
+    private static PostgreSQLContainer<?> postgres = PostgresContainer.getContainer();
     @Mock
     private HttpServletRequest request;
     @Mock

@@ -10,12 +10,12 @@ import org.mockito.MockitoAnnotations;
 import org.project.model.Permission;
 import org.project.service.PermissionService;
 import org.project.servlet.PermissionServlet;
-import org.project.util.PostgresPropertiesReader;
 
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
+import util.PostgresContainer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,12 +29,8 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 @Testcontainers
 class PermissionServletTest {
-    private static final PostgresPropertiesReader propertiesReader = new PostgresPropertiesReader();
     @Container
-    private static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest")
-            .withDatabaseName(propertiesReader.getDataBaseName())
-            .withUsername(propertiesReader.getUser())
-            .withPassword(propertiesReader.getPassword());
+    private static PostgreSQLContainer<?> postgres = PostgresContainer.getContainer();
     @Mock
     private HttpServletRequest request;
     @Mock

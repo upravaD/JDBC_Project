@@ -2,14 +2,16 @@ package service;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.project.dao.PermissionDAO;
 import org.project.model.Permission;
 import org.project.service.PermissionService;
 import org.project.util.PostgresConnection;
-import org.project.util.PostgresPropertiesReader;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import util.PostgresContainer;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -18,24 +20,19 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Testcontainers
 public class PermissionServiceTest {
-    private static final PostgresPropertiesReader propertiesReader = new PostgresPropertiesReader();
     @Container
-    private static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest")
-            .withDatabaseName(propertiesReader.getDataBaseName())
-            .withUsername(propertiesReader.getUser())
-            .withPassword(propertiesReader.getPassword());
-
-    private PermissionService permissionService;
+    private static PostgreSQLContainer<?> postgres = PostgresContainer.getContainer();
+    @Mock
     private PermissionDAO mockPermissionDAO;
+    private PermissionService permissionService;
 
     @Before
     public void setUp() {
-        mockPermissionDAO = mock(PermissionDAO.class);
+        MockitoAnnotations.openMocks(this);
         Connection connection = PostgresConnection.getConnection(
                 postgres.getDatabaseName(),
                 postgres.getUsername(),

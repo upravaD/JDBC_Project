@@ -2,15 +2,17 @@ package service;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.project.dao.RoleDAO;
 import org.project.model.Permission;
 import org.project.model.Role;
 import org.project.service.RoleService;
 import org.project.util.PostgresConnection;
-import org.project.util.PostgresPropertiesReader;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import util.PostgresContainer;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -19,24 +21,19 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Testcontainers
 public class RoleServiceTest {
-    private static final PostgresPropertiesReader propertiesReader = new PostgresPropertiesReader();
     @Container
-    private static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest")
-            .withDatabaseName(propertiesReader.getDataBaseName())
-            .withUsername(propertiesReader.getUser())
-            .withPassword(propertiesReader.getPassword());
-
-    private RoleService roleService;
+    private static PostgreSQLContainer<?> postgres = PostgresContainer.getContainer();
+    @Mock
     private RoleDAO mockRoleDAO;
+    private RoleService roleService;
 
     @Before
     public void setUp() {
-        mockRoleDAO = mock(RoleDAO.class);
+        MockitoAnnotations.openMocks(this);
         Connection mockConnection = PostgresConnection.getConnection(
                 postgres.getDatabaseName(),
                 postgres.getUsername(),
