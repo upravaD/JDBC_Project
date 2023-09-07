@@ -3,31 +3,18 @@ package org.project.servlet;
 import com.google.gson.Gson;
 import org.project.model.Permission;
 import org.project.service.PermissionService;
-import org.project.util.PostgresConnection;
 
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet(name = "PermissionServlet", value = "/permissions")
 public class PermissionServlet extends HttpServlet {
-    private Connection connection = PostgresConnection.getConnection();
-    private PermissionService permissionService;
+    private final PermissionService permissionService;
 
-    public PermissionServlet() {
-    }
-
-    public PermissionServlet(PermissionService permissionService, Connection connection) {
+    public PermissionServlet(PermissionService permissionService) {
         this.permissionService = permissionService;
-        this.connection = connection;
-    }
-
-    @Override
-    public void init() {
-        permissionService = new PermissionService(connection);
     }
 
     @Override
@@ -79,15 +66,6 @@ public class PermissionServlet extends HttpServlet {
         permissionService.remove(permission);
 
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-    }
-
-    @Override
-    public void destroy() {
-        try {
-            connection.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private void sendJson(HttpServletResponse response, String json) {

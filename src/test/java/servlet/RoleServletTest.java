@@ -12,7 +12,6 @@ import org.project.model.Role;
 import org.project.service.PermissionService;
 import org.project.service.RoleService;
 import org.project.servlet.RoleServlet;
-import org.project.util.PostgresConnection;
 import org.project.util.PostgresPropertiesReader;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -21,10 +20,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,20 +40,17 @@ class RoleServletTest {
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
-    private RoleServlet roleServlet;
+    @Mock
     private RoleService roleService;
+    @Mock
+    private PermissionService permissionService;
+    private RoleServlet roleServlet;
 
     @BeforeEach
     public void setup() {
         postgres.start();
-        Connection connection = PostgresConnection.getConnection(
-                postgres.getDatabaseName(),
-                postgres.getUsername(),
-                postgres.getPassword());
         MockitoAnnotations.openMocks(this);
-        roleService = mock(RoleService.class);
-        PermissionService permissionService = mock(PermissionService.class);
-        roleServlet = new RoleServlet(roleService, permissionService, connection);
+        roleServlet = new RoleServlet(roleService, permissionService);
     }
 
     @AfterEach

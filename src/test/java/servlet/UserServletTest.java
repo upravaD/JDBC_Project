@@ -10,7 +10,6 @@ import org.project.model.User;
 import org.project.service.RoleService;
 import org.project.service.UserService;
 import org.project.servlet.UserServlet;
-import org.project.util.PostgresConnection;
 import org.project.util.PostgresPropertiesReader;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -21,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,21 +38,17 @@ class UserServletTest {
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
-    private UserServlet userServlet;
+    @Mock
     private UserService userService;
+    @Mock
     private RoleService roleService;
+    private UserServlet userServlet;
 
     @BeforeEach
     public void setup() {
         postgres.start();
-        Connection connection = PostgresConnection.getConnection(
-                postgres.getDatabaseName(),
-                postgres.getUsername(),
-                postgres.getPassword());
         MockitoAnnotations.openMocks(this);
-        userService = mock(UserService.class);
-        roleService = mock(RoleService.class);
-        userServlet = new UserServlet(userService, roleService, connection);
+        userServlet = new UserServlet(userService, roleService);
     }
 
     @AfterEach

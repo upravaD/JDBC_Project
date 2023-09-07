@@ -10,7 +10,6 @@ import org.mockito.MockitoAnnotations;
 import org.project.model.Permission;
 import org.project.service.PermissionService;
 import org.project.servlet.PermissionServlet;
-import org.project.util.PostgresConnection;
 import org.project.util.PostgresPropertiesReader;
 
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -24,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,19 +39,15 @@ class PermissionServletTest {
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
-    private PermissionServlet permissionServlet;
+    @Mock
     private PermissionService permissionService;
+    private PermissionServlet permissionServlet;
 
     @BeforeEach
     public void setup() {
         postgres.start();
-        Connection connection = PostgresConnection.getConnection(
-                postgres.getDatabaseName(),
-                postgres.getUsername(),
-                postgres.getPassword());
         MockitoAnnotations.openMocks(this);
-        permissionService = mock(PermissionService.class);
-        permissionServlet = new PermissionServlet(permissionService, connection);
+        permissionServlet = new PermissionServlet(permissionService);
     }
 
     @AfterEach

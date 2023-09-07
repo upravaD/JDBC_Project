@@ -5,35 +5,21 @@ import org.project.model.Permission;
 import org.project.model.Role;
 import org.project.service.PermissionService;
 import org.project.service.RoleService;
-import org.project.util.PostgresConnection;
 
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(name = "RoleServlet", value = "/roles")
 public class RoleServlet extends HttpServlet {
-    private Connection connection = PostgresConnection.getConnection();
-    private RoleService roleService;
-    private PermissionService permissionService;
+    private final RoleService roleService;
+    private final PermissionService permissionService;
 
-    public RoleServlet() {
-    }
-
-    public RoleServlet(RoleService roleService, PermissionService permissionService, Connection connection) {
+    public RoleServlet(RoleService roleService, PermissionService permissionService) {
         this.roleService = roleService;
         this.permissionService = permissionService;
-        this.connection = connection;
-    }
-
-    @Override
-    public void init() {
-        roleService = new RoleService(connection);
-        permissionService = new PermissionService(connection);
     }
 
     @Override
@@ -91,15 +77,6 @@ public class RoleServlet extends HttpServlet {
         roleService.remove(role);
 
         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-    }
-
-    @Override
-    public void destroy() {
-        try {
-            connection.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private void sendJson(HttpServletResponse response, String json) {

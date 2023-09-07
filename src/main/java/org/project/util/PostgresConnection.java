@@ -5,29 +5,38 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class PostgresConnection {
-    private static Connection connection;
     private PostgresConnection(){}
     public static Connection getConnection() {
+        PostgresPropertiesReader propertiesReader = new PostgresPropertiesReader();
+        setDatabaseDriver();
         try {
-            Class.forName("org.postgresql.Driver");
-            PostgresPropertiesReader propertiesReader = new PostgresPropertiesReader();
-            connection = DriverManager.getConnection(
-                    propertiesReader.getUrl(),
+            return DriverManager.getConnection(
+                    propertiesReader.getUrl() + propertiesReader.getDataBaseName(),
                     propertiesReader.getUser(),
                     propertiesReader.getPassword());
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return connection;
     }
 
-    public static Connection getConnection(String url, String username, String password) {
+    public static Connection getConnection(String dbName, String username, String password) {
+        PostgresPropertiesReader propertiesReader = new PostgresPropertiesReader();
+        setDatabaseDriver();
+        try {
+            return DriverManager.getConnection(
+                    (propertiesReader.getUrl() + dbName),
+                    username,
+                    password);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void setDatabaseDriver() {
         try {
             Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection(("jdbc:postgresql://localhost:5432/" + url), username, password);
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return connection;
     }
 }

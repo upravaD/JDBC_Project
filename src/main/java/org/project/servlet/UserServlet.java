@@ -4,34 +4,20 @@ import com.google.gson.Gson;
 import org.project.model.User;
 import org.project.service.RoleService;
 import org.project.service.UserService;
-import org.project.util.PostgresConnection;
 
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet(name = "UserServlet", value = "/users")
 public class UserServlet extends HttpServlet {
-    private Connection connection = PostgresConnection.getConnection();
-    private UserService userService;
-    private RoleService roleService;
+    private final UserService userService;
+    private final RoleService roleService;
 
-    public UserServlet() {
-    }
-
-    public UserServlet(UserService userService, RoleService roleService, Connection connection) {
+    public UserServlet(UserService userService, RoleService roleService) {
         this.userService = userService;
         this.roleService = roleService;
-        this.connection = connection;
-    }
-
-    @Override
-    public void init() {
-        userService = new UserService(connection);
-        roleService = new RoleService(connection);
     }
 
     @Override
@@ -88,15 +74,6 @@ public class UserServlet extends HttpServlet {
         userService.remove(user);
 
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-    }
-
-    @Override
-    public void destroy() {
-        try {
-            connection.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private void sendJson(HttpServletResponse response, String json) {
