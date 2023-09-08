@@ -8,38 +8,29 @@ import org.project.dao.RoleDAO;
 import org.project.dao.UserDAO;
 import org.project.model.Role;
 import org.project.model.User;
-import org.project.util.PostgresConnection;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import util.PostgresContainer;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 @Testcontainers
 class UserDAOTest {
     @Container
     private static PostgreSQLContainer<?> postgres = PostgresContainer.getContainer();
-    private Connection connection;
     private UserDAO userDAO;
     private RoleDAO roleDAO;
 
     @BeforeEach
     public void setup() {
         postgres.start();
-        connection = PostgresConnection.getConnection(
-                postgres.getDatabaseName(),
-                postgres.getUsername(),
-                postgres.getPassword());
-        userDAO = new UserDAO(connection);
-        roleDAO = new RoleDAO(connection);
+        userDAO = new UserDAO();
+        roleDAO = new RoleDAO();
     }
 
     @AfterEach
-    public void cleanup() throws SQLException {
-        connection.close();
+    public void cleanup() {
         postgres.stop();
     }
 

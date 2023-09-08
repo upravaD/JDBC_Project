@@ -9,36 +9,26 @@ import org.project.dao.PermissionDAO;
 import org.project.dao.RoleDAO;
 import org.project.model.Permission;
 import org.project.model.Role;
-import org.project.util.PostgresConnection;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import util.PostgresContainer;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 @Testcontainers
 class RoleDAOTest {
     @Container
     private static PostgreSQLContainer<?> postgres = PostgresContainer.getContainer();
-    private Connection connection;
     private RoleDAO roleDAO;
 
     @BeforeEach
     public void setup() {
         postgres.start();
-        connection = PostgresConnection.getConnection(
-                postgres.getDatabaseName(),
-                postgres.getUsername(),
-                postgres.getPassword());
-        roleDAO = new RoleDAO(connection);
+        roleDAO = new RoleDAO();
     }
-
     @AfterEach
-    public void cleanup() throws SQLException {
-        connection.close();
+    public void cleanup() {
         postgres.stop();
     }
 
@@ -151,7 +141,7 @@ class RoleDAOTest {
         role.setRoleName("TestRole");
         roleDAO.create(role);
 
-        PermissionDAO permissionDAO = new PermissionDAO(connection);
+        PermissionDAO permissionDAO = new PermissionDAO();
         Permission permission = new Permission();
         permission.setPermissionName("TestPermission");
         permissionDAO.create(permission);
@@ -177,7 +167,7 @@ class RoleDAOTest {
         role.setRoleName("TestRole");
         roleDAO.create(role);
 
-        PermissionDAO permissionDAO = new PermissionDAO(connection);
+        PermissionDAO permissionDAO = new PermissionDAO();
         Permission permission = new Permission();
         permission.setPermissionName("TestPermission");
         permissionDAO.create(permission);

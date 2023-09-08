@@ -1,49 +1,43 @@
 package dao;
 
-import org.junit.jupiter.api.AfterEach;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import org.project.dao.PermissionDAO;
 import org.project.dao.RoleDAO;
 import org.project.model.Permission;
 import org.project.model.Role;
-import org.project.util.PostgresConnection;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import util.PostgresContainer;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 @Testcontainers
-class PermissionDAOTest {
+public class PermissionDAOTest {
     @Container
     private static PostgreSQLContainer<?> postgres = PostgresContainer.getContainer();
-    private Connection connection;
     private PermissionDAO permissionDAO;
 
-    @BeforeEach
+    @Before
     public void setup() {
         postgres.start();
-        connection = PostgresConnection.getConnection(
-                postgres.getDatabaseName(),
-                postgres.getUsername(),
-                postgres.getPassword());
-        permissionDAO = new PermissionDAO(connection);
+        permissionDAO = new PermissionDAO();
     }
 
-    @AfterEach
-    public void cleanup() throws SQLException {
-        connection.close();
+    @After
+    public void cleanup() {
         postgres.stop();
     }
 
     @Test
-    void testCreatePermission() {
+    public void testCreatePermission() {
         // Setup
         String name = "TestCreatePermission";
         Permission permission = new Permission();
@@ -54,16 +48,16 @@ class PermissionDAOTest {
 
         // Verify
         Permission createdPermission = permissionDAO.findByID(permission.getId());
-        Assertions.assertNotNull(createdPermission);
-        Assertions.assertEquals(name, createdPermission.getPermissionName());
-        Assertions.assertEquals(permission.getId(), createdPermission.getId());
+        assertNotNull(createdPermission);
+        assertEquals(name, createdPermission.getPermissionName());
+        assertEquals(permission.getId(), createdPermission.getId());
 
         // Cleanup
         permissionDAO.delete(permission);
     }
 
     @Test
-    void testGetAllPermissions() {
+    public void testGetAllPermissions() {
         // Setup
         String name1 = "TestGetAllPermission1";
         String name2 = "TestGetAllPermission2";
@@ -79,8 +73,8 @@ class PermissionDAOTest {
         List<Permission> permissions = permissionDAO.getALL();
 
         // Verify
-        Assertions.assertNotNull(permissions);
-        Assertions.assertEquals(beforePermissions.size() + 2, permissions.size());
+        assertNotNull(permissions);
+        assertEquals(beforePermissions.size() + 2, permissions.size());
 
         // Cleanup
         permissionDAO.delete(permission1);
@@ -88,7 +82,7 @@ class PermissionDAOTest {
     }
 
     @Test
-    void testFindPermissionByID() {
+    public void testFindPermissionByID() {
         // Setup
         Permission permission = new Permission();
         permission.setPermissionName("TestFindByIDPermission");
@@ -98,27 +92,27 @@ class PermissionDAOTest {
         Permission foundPermission = permissionDAO.findByID(permission.getId());
 
         // Verify
-        Assertions.assertNotNull(foundPermission);
-        Assertions.assertEquals(permission.getId(), foundPermission.getId());
-        Assertions.assertEquals(permission.getPermissionName(), foundPermission.getPermissionName());
+        assertNotNull(foundPermission);
+        assertEquals(permission.getId(), foundPermission.getId());
+        assertEquals(permission.getPermissionName(), foundPermission.getPermissionName());
 
         // Cleanup
         permissionDAO.delete(permission);
     }
 
     @Test
-    void testFindNonExistentPermission() {
+    public void testFindNonExistentPermission() {
         // Test
         Permission nonExistentPermission = permissionDAO.findByID(-1L);
 
         // Verify
-        Assertions.assertNotNull(nonExistentPermission);
+        assertNotNull(nonExistentPermission);
         Assertions.assertEquals(-1L, nonExistentPermission.getId());
-        Assertions.assertEquals("emptyPermissionName", nonExistentPermission.getPermissionName());
+        assertEquals("emptyPermissionName", nonExistentPermission.getPermissionName());
     }
 
     @Test
-    void testUpdatePermission() {
+    public void testUpdatePermission() {
         // Setup
         Permission permission = new Permission();
         permission.setPermissionName("TestOldPermission");
@@ -133,15 +127,15 @@ class PermissionDAOTest {
 
         // Verify
         Permission retrievedPermission = permissionDAO.findByID(permission.getId());
-        Assertions.assertNotNull(retrievedPermission);
-        Assertions.assertEquals(updatedPermission.getPermissionName(), retrievedPermission.getPermissionName());
+        assertNotNull(retrievedPermission);
+        assertEquals(updatedPermission.getPermissionName(), retrievedPermission.getPermissionName());
 
         // Cleanup
         permissionDAO.delete(updatedPermission);
     }
 
     @Test
-    void testDeletePermission() {
+    public void testDeletePermission() {
         // Setup
         Permission permission = new Permission();
         permission.setPermissionName("TestDeletePermission");
@@ -152,15 +146,15 @@ class PermissionDAOTest {
 
         // Verify
         Permission deletedPermission = permissionDAO.findByID(permission.getId());
-        Assertions.assertNotNull(deletedPermission);
+        assertNotNull(deletedPermission);
         Assertions.assertEquals(-1L, deletedPermission.getId());
-        Assertions.assertEquals("emptyPermissionName", deletedPermission.getPermissionName());
+        assertEquals("emptyPermissionName", deletedPermission.getPermissionName());
     }
 
     @Test
-    void testGetRolesByPermission() {
+    public void testGetRolesByPermission() {
         // Setup
-        RoleDAO roleDAO = new RoleDAO(connection);
+        RoleDAO roleDAO = new RoleDAO();
         Permission permission = new Permission();
         permission.setPermissionName("TestRolesPermission");
         permissionDAO.create(permission);
@@ -175,10 +169,10 @@ class PermissionDAOTest {
         expectedPermission.setRoles(roles);
 
         // Verify
-        Assertions.assertNotNull(roles);
-        Assertions.assertEquals(1, roles.size());
-        Assertions.assertEquals("TestRolesPermission", expectedPermission.getPermissionName());
-        Assertions.assertEquals(roles.get(0), expectedPermission.getRoles().get(0));
+        assertNotNull(roles);
+        assertEquals(1, roles.size());
+        assertEquals("TestRolesPermission", expectedPermission.getPermissionName());
+        assertEquals(roles.get(0), expectedPermission.getRoles().get(0));
 
         // Cleanup
         permissionDAO.deleteRolePermission(permission);

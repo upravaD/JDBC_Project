@@ -1,5 +1,6 @@
 package service;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -8,13 +9,11 @@ import org.project.dao.RoleDAO;
 import org.project.model.Permission;
 import org.project.model.Role;
 import org.project.service.RoleService;
-import org.project.util.PostgresConnection;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import util.PostgresContainer;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,13 +32,14 @@ public class RoleServiceTest {
 
     @Before
     public void setUp() {
+        postgres.start();
         MockitoAnnotations.openMocks(this);
-        Connection mockConnection = PostgresConnection.getConnection(
-                postgres.getDatabaseName(),
-                postgres.getUsername(),
-                postgres.getPassword());
-        roleService = new RoleService(mockConnection);
+        roleService = new RoleService();
         roleService.setRoleDAO(mockRoleDAO);
+    }
+    @After
+    public void cleanup() {
+        postgres.stop();
     }
 
     @Test

@@ -1,5 +1,6 @@
 package service;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -7,13 +8,11 @@ import org.mockito.MockitoAnnotations;
 import org.project.dao.UserDAO;
 import org.project.model.User;
 import org.project.service.UserService;
-import org.project.util.PostgresConnection;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import util.PostgresContainer;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,13 +31,15 @@ public class UserServiceTest {
 
     @Before
     public void setUp() {
+        postgres.start();
         MockitoAnnotations.openMocks(this);
-        Connection mockConnection = PostgresConnection.getConnection(
-                postgres.getDatabaseName(),
-                postgres.getUsername(),
-                postgres.getPassword());
-        userService = new UserService(mockConnection);
+        userService = new UserService();
         userService.setUserDAO(mockUserDAO);
+    }
+
+    @After
+    public void cleanUp() {
+        postgres.stop();
     }
 
     @Test
