@@ -4,14 +4,13 @@ import org.project.dao.RoleDAO;
 import org.project.model.Permission;
 import org.project.model.Role;
 
-import java.sql.Connection;
 import java.util.List;
 
 public class RoleService implements Service<Role> {
     private RoleDAO roleDAO;
 
-    public RoleService(Connection connection) {
-        this.roleDAO = new RoleDAO(connection);
+    public RoleService() {
+        this.roleDAO = new RoleDAO();
     }
 
     @Override

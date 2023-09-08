@@ -3,14 +3,13 @@ package org.project.service;
 import org.project.dao.PermissionDAO;
 import org.project.model.Permission;
 
-import java.sql.Connection;
 import java.util.List;
 
 public class PermissionService implements Service<Permission> {
     private PermissionDAO permissionDAO;
 
-    public PermissionService(Connection connection) {
-        this.permissionDAO = new PermissionDAO(connection);
+    public PermissionService() {
+        this.permissionDAO = new PermissionDAO();
     }
 
     @Override
