@@ -2,6 +2,7 @@ package org.project.dao;
 
 import org.project.model.Permission;
 import org.project.model.Role;
+import org.project.util.PostgresConnection;
 import org.project.util.Queries;
 
 import java.sql.Connection;
@@ -12,15 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PermissionDAO implements DAO<Permission> {
-    private final Connection connection;
-
-    public PermissionDAO(Connection connection) {
-        this.connection = connection;
-    }
 
     @Override
     public boolean create(Permission permission) {
-        try (PreparedStatement preparedStatement =
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.PERMISSION_CREATE.get())) {
             preparedStatement.setString(1, permission.getPermissionName());
             preparedStatement.execute();
@@ -37,7 +34,8 @@ public class PermissionDAO implements DAO<Permission> {
     @Override
     public List<Permission> getALL() {
         List<Permission> permissions = new ArrayList<>();
-        try (PreparedStatement preparedStatement =
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.PERMISSION_GET_ALL.get())) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -55,7 +53,8 @@ public class PermissionDAO implements DAO<Permission> {
     @Override
     public Permission findByID(Long id) {
         Permission permission = null;
-        try (PreparedStatement preparedStatement =
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.PERMISSION_FIND_BY_ID.get())) {
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -77,7 +76,8 @@ public class PermissionDAO implements DAO<Permission> {
 
     @Override
     public boolean update(Permission permission) {
-        try (PreparedStatement preparedStatement =
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.PERMISSION_UPDATE.get())) {
             preparedStatement.setString(1, permission.getPermissionName());
             preparedStatement.setLong(2, permission.getId());
@@ -91,7 +91,8 @@ public class PermissionDAO implements DAO<Permission> {
 
     @Override
     public boolean delete(Permission permission) {
-        try (PreparedStatement preparedStatement =
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.PERMISSION_DELETE.get())) {
             preparedStatement.setLong(1, permission.getId());
             preparedStatement.setString(2, permission.getPermissionName());
@@ -104,7 +105,8 @@ public class PermissionDAO implements DAO<Permission> {
     }
 
     public boolean deleteRolePermission(Permission permission) {
-        try (PreparedStatement preparedStatement =
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.PERMISSION_DELETE_PERMISSION_ROLE.get())) {
             preparedStatement.setLong(1, permission.getId());
             preparedStatement.executeUpdate();
@@ -116,13 +118,14 @@ public class PermissionDAO implements DAO<Permission> {
     }
     public List<Role> getRolePermissionByID(Permission permission) {
         List<Role> roles = new ArrayList<>();
-        try (PreparedStatement preparedStatement =
-                     connection.prepareStatement("SELECT role_id FROM role_permissions where permission_id = ?")) {
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement =
+                     connection.prepareStatement(Queries.PERMISSION_GET_PERMISSION_ROLE.get())) {
             preparedStatement.setLong(1, permission.getId());
             preparedStatement.execute();
             ResultSet resultSet = preparedStatement.getResultSet();
             while (resultSet.next()) {
-                roles.add(new RoleDAO(connection).findByID(resultSet.getLong("role_id")));
+                roles.add(new RoleDAO().findByID(resultSet.getLong("role_id")));
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -7,6 +7,7 @@ public enum Queries {
     PERMISSION_UPDATE("UPDATE permissions SET permission_name = ? WHERE id = ?"),
     PERMISSION_DELETE("DELETE FROM permissions WHERE id = ? AND permission_name = ?"),
     PERMISSION_DELETE_PERMISSION_ROLE("DELETE FROM role_permissions WHERE permission_id = ?"),
+    PERMISSION_GET_PERMISSION_ROLE("SELECT role_id FROM role_permissions where permission_id = ?"),
 
     ROLE_CREATE("INSERT INTO roles (id, role_name) VALUES (DEFAULT, ?) RETURNING id"),
     ROLE_SET_PERMISSIONS("INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)"),

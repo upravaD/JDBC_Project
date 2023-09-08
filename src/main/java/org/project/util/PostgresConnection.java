@@ -15,20 +15,7 @@ public class PostgresConnection {
                     propertiesReader.getUser(),
                     propertiesReader.getPassword());
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static Connection getConnection(String dbName, String username, String password) {
-        PostgresPropertiesReader propertiesReader = new PostgresPropertiesReader();
-        setDatabaseDriver();
-        try {
-            return DriverManager.getConnection(
-                    (propertiesReader.getUrl() + dbName),
-                    username,
-                    password);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException();
         }
     }
 

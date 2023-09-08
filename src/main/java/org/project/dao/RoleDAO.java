@@ -2,6 +2,7 @@ package org.project.dao;
 
 import org.project.model.Permission;
 import org.project.model.Role;
+import org.project.util.PostgresConnection;
 import org.project.util.Queries;
 
 import java.sql.Connection;
@@ -12,15 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RoleDAO implements DAO<Role> {
-    private final Connection connection;
-
-    public RoleDAO(Connection connection) {
-        this.connection = connection;
-    }
 
     @Override
     public boolean create(Role role) {
-        try (PreparedStatement preparedStatement =
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.ROLE_CREATE.get())) {
             preparedStatement.setString(1, role.getRoleName());
             preparedStatement.execute();
@@ -37,7 +34,8 @@ public class RoleDAO implements DAO<Role> {
     @Override
     public List<Role> getALL() {
         List<Role> roles = new ArrayList<>();
-        try (PreparedStatement preparedStatement =
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.ROLE_GET_ALL.get())) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -53,7 +51,8 @@ public class RoleDAO implements DAO<Role> {
     public Role findByID(Long id) {
         Role role = new Role();
         List<Permission> tempPermissions = new ArrayList<>();
-        try (PreparedStatement preparedStatement =
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.ROLE_FIND_BY_ID.get())) {
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -64,7 +63,7 @@ public class RoleDAO implements DAO<Role> {
                     role.setRoleName(resultSet.getString("role_name"));
                     roleFound = true;
                 }
-                PermissionDAO permissionDAO = new PermissionDAO(connection);
+                PermissionDAO permissionDAO = new PermissionDAO();
                 Permission permission = permissionDAO.findByID(resultSet.getLong("permission_id"));
                 tempPermissions.add(permission);
             }
@@ -81,7 +80,8 @@ public class RoleDAO implements DAO<Role> {
 
     @Override
     public boolean update(Role role) {
-        try (PreparedStatement preparedStatement =
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.ROLE_UPDATE.get())) {
             preparedStatement.setString(1, role.getRoleName());
             preparedStatement.setLong(2, role.getId());
@@ -95,7 +95,8 @@ public class RoleDAO implements DAO<Role> {
 
     @Override
     public boolean delete(Role role) {
-        try (PreparedStatement preparedStatement =
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.ROLE_DELETE.get())) {
             preparedStatement.setLong(1, role.getId());
             preparedStatement.setString(2, role.getRoleName());
@@ -108,7 +109,8 @@ public class RoleDAO implements DAO<Role> {
     }
 
     public boolean setRolePermission(Role role, Permission permission) {
-        try (PreparedStatement preparedStatement =
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.ROLE_SET_PERMISSIONS.get())) {
             preparedStatement.setLong(1, role.getId());
             preparedStatement.setLong(2, permission.getId());
@@ -120,7 +122,8 @@ public class RoleDAO implements DAO<Role> {
         return false;
     }
     public boolean deleteRolePermission(Role role) {
-        try (PreparedStatement preparedStatement =
+        try (Connection connection = PostgresConnection.getConnection();
+             PreparedStatement preparedStatement =
                      connection.prepareStatement(Queries.ROLE_DELETE_ROLE_PERMISSION.get())) {
             preparedStatement.setLong(1, role.getId());
             preparedStatement.executeUpdate();
