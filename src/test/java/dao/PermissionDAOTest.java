@@ -9,6 +9,7 @@ import org.project.dao.PermissionDAO;
 import org.project.dao.RoleDAO;
 import org.project.model.Permission;
 import org.project.model.Role;
+import org.project.util.PostgresConnection;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -16,8 +17,7 @@ import util.PostgresContainer;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 @Testcontainers
 public class PermissionDAOTest {
@@ -28,6 +28,10 @@ public class PermissionDAOTest {
     @Before
     public void setup() {
         postgres.start();
+        PostgresConnection.setParameters(
+                postgres.getJdbcUrl(),
+                postgres.getUsername(),
+                postgres.getPassword());
         permissionDAO = new PermissionDAO();
     }
 

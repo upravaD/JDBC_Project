@@ -9,6 +9,7 @@ import org.project.dao.PermissionDAO;
 import org.project.dao.RoleDAO;
 import org.project.model.Permission;
 import org.project.model.Role;
+import org.project.util.PostgresConnection;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -25,6 +26,10 @@ class RoleDAOTest {
     @BeforeEach
     public void setup() {
         postgres.start();
+        PostgresConnection.setParameters(
+                postgres.getJdbcUrl(),
+                postgres.getUsername(),
+                postgres.getPassword());
         roleDAO = new RoleDAO();
     }
     @AfterEach
