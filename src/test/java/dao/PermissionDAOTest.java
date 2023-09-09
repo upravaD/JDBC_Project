@@ -4,7 +4,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-
 import org.project.dao.PermissionDAO;
 import org.project.dao.RoleDAO;
 import org.project.model.Permission;
@@ -13,16 +12,20 @@ import org.project.util.PostgresConnection;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import util.PostgresContainer;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @Testcontainers
 public class PermissionDAOTest {
     @Container
-    private static PostgreSQLContainer<?> postgres = PostgresContainer.getContainer();
+    private static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
+            .withDatabaseName("test")
+            .withUsername("test")
+            .withPassword("test")
+            .withInitScript("dbtest.sql");
     private PermissionDAO permissionDAO;
 
     @Before

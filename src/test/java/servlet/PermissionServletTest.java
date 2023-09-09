@@ -1,21 +1,15 @@
 package servlet;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
 import org.project.model.Permission;
 import org.project.service.PermissionService;
 import org.project.servlet.PermissionServlet;
-
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
-import util.PostgresContainer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,8 +23,6 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 @Testcontainers
 class PermissionServletTest {
-    @Container
-    private static PostgreSQLContainer<?> postgres = PostgresContainer.getContainer();
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -41,14 +33,8 @@ class PermissionServletTest {
 
     @BeforeEach
     public void setup() {
-        postgres.start();
         MockitoAnnotations.openMocks(this);
         permissionServlet = new PermissionServlet(permissionService);
-    }
-
-    @AfterEach
-    public void cleanup() {
-        postgres.stop();
     }
 
     @Test

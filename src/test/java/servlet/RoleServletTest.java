@@ -1,7 +1,6 @@
 package servlet;
 
 import com.google.gson.Gson;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,10 +11,7 @@ import org.project.model.Role;
 import org.project.service.PermissionService;
 import org.project.service.RoleService;
 import org.project.servlet.RoleServlet;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import util.PostgresContainer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,8 +26,6 @@ import static org.mockito.Mockito.*;
 
 @Testcontainers
 class RoleServletTest {
-    @Container
-    private static PostgreSQLContainer<?> postgres = PostgresContainer.getContainer();
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -44,14 +38,8 @@ class RoleServletTest {
 
     @BeforeEach
     public void setup() {
-        postgres.start();
         MockitoAnnotations.openMocks(this);
         roleServlet = new RoleServlet(roleService, permissionService);
-    }
-
-    @AfterEach
-    public void cleanup() {
-        postgres.stop();
     }
 
     @Test

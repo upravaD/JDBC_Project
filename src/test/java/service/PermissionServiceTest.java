@@ -1,6 +1,5 @@
 package service;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -8,10 +7,7 @@ import org.mockito.MockitoAnnotations;
 import org.project.dao.PermissionDAO;
 import org.project.model.Permission;
 import org.project.service.PermissionService;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import util.PostgresContainer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,23 +19,15 @@ import static org.mockito.Mockito.when;
 
 @Testcontainers
 public class PermissionServiceTest {
-    @Container
-    private static PostgreSQLContainer<?> postgres = PostgresContainer.getContainer();
     @Mock
     private PermissionDAO mockPermissionDAO;
     private PermissionService permissionService;
 
     @Before
     public void setUp() {
-        postgres.start();
         MockitoAnnotations.openMocks(this);
         permissionService = new PermissionService();
         permissionService.setPermissionDAO(mockPermissionDAO);
-    }
-
-    @After
-    public void cleanUp() {
-        postgres.stop();
     }
 
     @Test

@@ -12,14 +12,17 @@ import org.project.util.PostgresConnection;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import util.PostgresContainer;
 
 import java.util.List;
 
 @Testcontainers
 class UserDAOTest {
     @Container
-    private static PostgreSQLContainer<?> postgres = PostgresContainer.getContainer();
+    private static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
+            .withDatabaseName("test")
+            .withUsername("test")
+            .withPassword("test")
+            .withInitScript("dbtest.sql");
     private UserDAO userDAO;
     private RoleDAO roleDAO;
 

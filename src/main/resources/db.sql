@@ -26,18 +26,18 @@ CREATE TABLE IF NOT EXISTS role_permissions (role_id INT,
 
 
 /*Заполнение таблиц*/
-INSERT INTO users (id, username, role_id) VALUES (DEFAULT, 'User_1', 1);
-INSERT INTO users (id, username, role_id) VALUES (DEFAULT, 'User_2', 2);
-INSERT INTO users (id, username, role_id) VALUES (DEFAULT, 'User_3', 3);
-INSERT INTO users (id, username, role_id) VALUES (DEFAULT, 'User_4', 4);
-INSERT INTO users (id, username, role_id) VALUES (DEFAULT, 'User_5', 5);
-
-
 INSERT INTO roles (id, role_name) VALUES (DEFAULT, 'Директор');
 INSERT INTO roles (id, role_name) VALUES (DEFAULT, 'Бухгалтер');
 INSERT INTO roles (id, role_name) VALUES (DEFAULT, 'Продавец');
 INSERT INTO roles (id, role_name) VALUES (DEFAULT, 'Охранник');
 INSERT INTO roles (id, role_name) VALUES (DEFAULT, 'Уборщик');
+
+
+INSERT INTO users (id, username, role_id) VALUES (DEFAULT, 'User_1', 1);
+INSERT INTO users (id, username, role_id) VALUES (DEFAULT, 'User_2', 2);
+INSERT INTO users (id, username, role_id) VALUES (DEFAULT, 'User_3', 3);
+INSERT INTO users (id, username, role_id) VALUES (DEFAULT, 'User_4', 4);
+INSERT INTO users (id, username, role_id) VALUES (DEFAULT, 'User_5', 5);
 
 
 INSERT INTO permissions (id, permission_name) VALUES (DEFAULT, 'Управление');

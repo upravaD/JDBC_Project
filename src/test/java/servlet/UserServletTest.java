@@ -1,6 +1,5 @@
 package servlet;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -10,9 +9,6 @@ import org.project.model.User;
 import org.project.service.RoleService;
 import org.project.service.UserService;
 import org.project.servlet.UserServlet;
-import util.PostgresContainer;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,8 +24,6 @@ import static org.mockito.Mockito.*;
 
 @Testcontainers
 class UserServletTest {
-    @Container
-    private static PostgreSQLContainer<?> postgres = PostgresContainer.getContainer();
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -42,14 +36,8 @@ class UserServletTest {
 
     @BeforeEach
     public void setup() {
-        postgres.start();
         MockitoAnnotations.openMocks(this);
         userServlet = new UserServlet(userService, roleService);
-    }
-
-    @AfterEach
-    public void cleanup() {
-        postgres.stop();
     }
 
     @Test
